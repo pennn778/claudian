@@ -298,6 +298,12 @@
       "leftSidebar": "Linke Seitenleiste",
       "mainTab": "Haupteditor-Tab"
     },
+    "claudeHomeDirName": {
+      "name": "Name des Claude-Home-Verzeichnisses",
+      "desc": "Name des Claude-Konfigurationsverzeichnisses (z. B. '.claude' oder '.claude-internal'). Steuert sowohl das globale Home (~/.claude/) als auch das Konfigurationsverzeichnis im Vault. Erfordert einen Neustart.",
+      "validation": "Muss mit '.' beginnen und darf keine Pfadtrennzeichen enthalten",
+      "restartNotice": "Claude-Home-Verzeichnis geändert. Starten Sie Obsidian neu, um es anzuwenden."
+    },
     "cliPath": {
       "name": "Claude CLI-Pfad",
       "desc": "Benutzerdefinierter Pfad zum Claude Code CLI. Leer lassen für automatische Erkennung.",
