@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { Setting } from 'obsidian';
+import { Notice, Setting } from 'obsidian';
 
 import { ProviderSettingsCoordinator } from '../../../core/providers/ProviderSettingsCoordinator';
 import type { ProviderSettingsTabRenderer } from '../../../core/providers/types';
@@ -9,6 +9,7 @@ import { McpSettingsManager } from '../../../shared/settings/McpSettingsManager'
 import { getHostnameKey } from '../../../utils/env';
 import { expandHomePath } from '../../../utils/path';
 import { getClaudeWorkspaceServices } from '../app/ClaudeWorkspaceServices';
+import { isValidClaudeHomeDirName } from '../claudePaths';
 import { resolveClaudeModelSelection } from '../modelOptions';
 import {
   CLAUDE_SAFE_MODES,
@@ -136,6 +137,43 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
 
       updateCliPathValidation(currentValue, text.inputEl);
     });
+
+    // Claude home directory name (supports custom CLI builds like `claude-internal`
+    // that store data in ~/.claude-internal/). Requires a restart because global
+    // path resolution must not change mid-session.
+    const claudeHomeDirValidationEl = container.createDiv({
+      cls: 'claudian-claude-home-validation claudian-setting-validation claudian-setting-validation-error claudian-hidden',
+    });
+
+    new Setting(container)
+      .setName(t('settings.claudeHomeDirName.name'))
+      .setDesc(t('settings.claudeHomeDirName.desc'))
+      .addText((text) => {
+        text
+          // eslint-disable-next-line obsidianmd/ui/sentence-case -- placeholder is a literal directory name
+          .setPlaceholder('.claude')
+          .setValue(claudeSettings.claudeHomeDirName)
+          .onChange(async (value) => {
+            const trimmed = value.trim();
+
+            if (trimmed && !isValidClaudeHomeDirName(trimmed)) {
+              claudeHomeDirValidationEl.setText(t('settings.claudeHomeDirName.validation'));
+              claudeHomeDirValidationEl.toggleClass('claudian-hidden', false);
+              return;
+            }
+
+            claudeHomeDirValidationEl.toggleClass('claudian-hidden', true);
+            const dirName = trimmed || '.claude';
+
+            // Persist only — do NOT call setClaudeHomeDirName() here. Path
+            // resolution is fixed at load time; a restart is required to apply.
+            updateClaudeProviderSettings(settingsBag, { claudeHomeDirName: dirName });
+            await context.plugin.saveSettings();
+
+            new Notice(t('settings.claudeHomeDirName.restartNotice'));
+          });
+        text.inputEl.addClass('claudian-settings-claude-home-input');
+      });
 
     // --- Safety ---
 
