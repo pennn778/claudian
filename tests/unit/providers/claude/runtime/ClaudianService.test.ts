@@ -904,6 +904,63 @@ describe('ClaudianService', () => {
     });
   });
 
+  describe('SDK Supported Models', () => {
+    it('should return empty array when no persistent query', async () => {
+      (service as any).persistentQuery = null;
+      const models = await service.getSupportedModels();
+      expect(models).toEqual([]);
+    });
+
+    it('should convert SDK ModelInfo to provider UI options', async () => {
+      const mockSdkModels = [
+        { value: 'claude-sonnet-4-5', displayName: 'Claude 4.5 Sonnet', description: 'Fast and capable' },
+        { value: 'claude-opus-4-6', displayName: 'Opus 4.6', description: 'Most powerful' },
+      ];
+      const mockQuery = {
+        supportedModels: jest.fn().mockResolvedValue(mockSdkModels),
+      };
+      (service as any).persistentQuery = mockQuery;
+
+      const models = await service.getSupportedModels();
+
+      expect(mockQuery.supportedModels).toHaveBeenCalled();
+      expect(models).toEqual([
+        { value: 'claude-sonnet-4-5', label: 'Claude 4.5 Sonnet', description: 'Fast and capable' },
+        { value: 'claude-opus-4-6', label: 'Opus 4.6', description: 'Most powerful' },
+      ]);
+    });
+
+    it('should publish detected models to the shared Claude model cache', async () => {
+      const { getRuntimeDetectedClaudeModels, setRuntimeDetectedClaudeModels } =
+        await import('@/providers/claude/modelOptions');
+      setRuntimeDetectedClaudeModels([]);
+
+      const mockQuery = {
+        supportedModels: jest.fn().mockResolvedValue([
+          { value: 'internal-opus', displayName: 'Internal Opus', description: 'Custom build' },
+        ]),
+      };
+      (service as any).persistentQuery = mockQuery;
+
+      await service.getSupportedModels();
+
+      expect(getRuntimeDetectedClaudeModels()).toEqual([
+        { value: 'internal-opus', label: 'Internal Opus', description: 'Custom build' },
+      ]);
+      setRuntimeDetectedClaudeModels([]);
+    });
+
+    it('should return empty array on SDK error', async () => {
+      const mockQuery = {
+        supportedModels: jest.fn().mockRejectedValue(new Error('SDK error')),
+      };
+      (service as any).persistentQuery = mockQuery;
+
+      const models = await service.getSupportedModels();
+      expect(models).toEqual([]);
+    });
+  });
+
   describe('isPipeError', () => {
     it('should return true for EPIPE code', () => {
       const error = { code: 'EPIPE' };
