@@ -723,7 +723,17 @@ export async function initializeTabService(
       providerId,
     });
     service = runtime;
-    unsubscribeReadyState = runtime.onReadyStateChange(() => {});
+    unsubscribeReadyState = runtime.onReadyStateChange((ready) => {
+      // When the runtime becomes ready, refresh the model list from the SDK
+      // (if the provider supports it) so runtime-detected models appear.
+      if (!ready || !runtime.getSupportedModels) return;
+      void runtime.getSupportedModels()
+        .then(() => {
+          tab.ui.modelSelector?.updateDisplay();
+          tab.ui.modelSelector?.renderOptions();
+        })
+        .catch(() => { /* non-critical: keep existing model list */ });
+    });
     tab.dom.eventCleanups.push(() => unsubscribeReadyState?.());
 
     // Passive sync: set session state without starting the runtime process.
