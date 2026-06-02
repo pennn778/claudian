@@ -11,11 +11,15 @@ import * as path from 'path';
 
 import type { AgentDefinition, AgentFrontmatter } from '../../../core/types';
 import { mapWithConcurrency } from '../../../utils/concurrency';
+import { getVaultClaudePath } from '../claudePaths';
 import { resolveClaudeConfigDir } from '../config/ClaudeConfigDir';
 import type { PluginManager } from '../plugins/PluginManager';
 import { buildAgentFromFrontmatter, parseAgentFile } from './AgentStorage';
 
-const VAULT_AGENTS_DIR = '.claude/agents';
+function getVaultAgentsDir(): string {
+  return getVaultClaudePath('agents');
+}
+
 const PLUGIN_AGENTS_DIR = 'agents';
 const AGENT_FILE_READ_CONCURRENCY = 8;
 
@@ -119,7 +123,7 @@ export class AgentManager {
   }
 
   async #loadVaultAgents(): Promise<void> {
-    await this.#loadAgentsFromDirectory(path.join(this.vaultPath, VAULT_AGENTS_DIR), 'vault');
+    await this.#loadAgentsFromDirectory(path.join(this.vaultPath, getVaultAgentsDir()), 'vault');
   }
 
   async #loadGlobalAgents(): Promise<void> {
