@@ -1,4 +1,4 @@
-import type { ProviderCapabilities, ProviderId } from '../providers/types';
+import type { ProviderCapabilities, ProviderId, ProviderUIOption } from '../providers/types';
 import type { ChatMessage, Conversation, SlashCommand, StreamChunk, ToolCallInfo } from '../types';
 import type {
   ApprovalCallback,
@@ -49,6 +49,11 @@ export interface ChatRuntime {
   onSupportedCommandsChange?(
     listener: (commands: readonly SlashCommand[]) => void,
   ): () => void;
+  /**
+   * Optional: models the provider reports as available at runtime. Implemented
+   * by providers (e.g. Claude) that can query the SDK for the live model list.
+   */
+  getSupportedModels?(): Promise<ProviderUIOption[]>;
   getAuxiliaryModel?(): string | null;
   cleanup(): void;
   previewRewind?(
