@@ -238,17 +238,30 @@ export default class ClaudianPlugin extends Plugin {
   async onload() {
     StartupProfiler.startOnload();
     try {
-      await StartupProfiler.runAsync(
-        'settings-load',
-        () => this.loadSettings({ deferNonRestoredSessionMetadata: true }),
-      );
+      // Settings initialization is wrapped so a failure (corrupt settings,
+      // storage migration, etc.) never prevents the critical registrations below
+      // from running — otherwise the plugin would silently fail on startup.
+      try {
+        await StartupProfiler.runAsync(
+          'settings-load',
+          () => this.loadSettings({ deferNonRestoredSessionMetadata: true }),
+        );
 
-      // Apply the configurable Claude home directory name (e.g. `.claude-internal`)
-      // before provider workspace services resolve the global (~/.claude) and
-      // vault-level (.claude) paths from it.
-      setClaudeHomeDirName(
-        getClaudeProviderSettings(this.settings as unknown as Record<string, unknown>).claudeHomeDirName,
-      );
+        // Apply the configurable Claude home directory name (e.g. `.claude-internal`)
+        // before provider workspace services resolve the global (~/.claude) and
+        // vault-level (.claude) paths from it.
+        setClaudeHomeDirName(
+          getClaudeProviderSettings(this.settings as unknown as Record<string, unknown>).claudeHomeDirName,
+        );
+      } catch {
+        // Minimum viable state so views/commands can still register.
+        if (!this.storage) {
+          this.storage = new SharedStorageService(this);
+        }
+        if (!this.settings) {
+          this.settings = { ...DEFAULT_CLAUDIAN_SETTINGS } as ClaudianSettings;
+        }
+      }
       // Provider workspace services are initialized lazily on first use.
 
       this.registerView(
