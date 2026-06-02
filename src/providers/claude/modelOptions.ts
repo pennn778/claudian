@@ -5,6 +5,22 @@ import { formatCustomModelLabel } from './modelLabels';
 import { getClaudeProviderSettings } from './settings';
 import { DEFAULT_CLAUDE_MODELS, filterVisibleModelOptions } from './types/models';
 
+/**
+ * Models detected at runtime from the SDK (`query.supportedModels()`), populated
+ * by the Claude runtime once a persistent query is ready. Lets custom CLI builds
+ * (e.g. claude-internal) surface their actual available models in the dropdown.
+ * Process-global and Claude-scoped; last writer wins (matches single-runtime use).
+ */
+let runtimeDetectedModels: ProviderUIOption[] = [];
+
+export function setRuntimeDetectedClaudeModels(models: ProviderUIOption[]): void {
+  runtimeDetectedModels = models;
+}
+
+export function getRuntimeDetectedClaudeModels(): ProviderUIOption[] {
+  return runtimeDetectedModels;
+}
+
 function parseConfiguredCustomModelIds(value: string): string[] {
   const modelIds: string[] = [];
   const seen = new Set<string>();
@@ -50,6 +66,12 @@ export function getClaudeModelOptions(settings: Record<string, unknown>): Provid
   );
   if (customModels.length > 0) {
     return customModels;
+  }
+
+  // Explicit env/custom config takes precedence; otherwise prefer models the SDK
+  // actually reports at runtime over the hardcoded defaults.
+  if (runtimeDetectedModels.length > 0) {
+    return runtimeDetectedModels;
   }
 
   const claudeSettings = getClaudeProviderSettings(settings);
