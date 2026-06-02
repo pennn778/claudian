@@ -5,7 +5,13 @@ import type {
   McpServerConfig,
 } from '../../../core/types';
 import { DEFAULT_MCP_SERVER, isValidMcpServerConfig } from '../../../core/types';
+import { getVaultClaudePath } from '../claudePaths';
 
+export function getMcpConfigPath(): string {
+  return getVaultClaudePath('mcp.json');
+}
+
+/** @deprecated Use getMcpConfigPath() instead. Resolves the static default `.claude/mcp.json`. */
 export const MCP_CONFIG_PATH = '.claude/mcp.json';
 
 export class McpStorage {
@@ -13,11 +19,12 @@ export class McpStorage {
 
   async load(): Promise<ManagedMcpServer[]> {
     try {
-      if (!(await this.adapter.exists(MCP_CONFIG_PATH))) {
+      const configPath = getMcpConfigPath();
+      if (!(await this.adapter.exists(configPath))) {
         return [];
       }
 
-      const content = await this.adapter.read(MCP_CONFIG_PATH);
+      const content = await this.adapter.read(configPath);
       const file = JSON.parse(content) as ManagedMcpConfigFile;
 
       if (!file.mcpServers || typeof file.mcpServers !== 'object') {
@@ -95,9 +102,10 @@ export class McpStorage {
     }
 
     let existing: Record<string, unknown> | null = null;
-    if (await this.adapter.exists(MCP_CONFIG_PATH)) {
+    const configPath = getMcpConfigPath();
+    if (await this.adapter.exists(configPath)) {
       try {
-        const raw = await this.adapter.read(MCP_CONFIG_PATH);
+        const raw = await this.adapter.read(configPath);
         const parsed: unknown = JSON.parse(raw);
         if (parsed && typeof parsed === 'object') {
           existing = parsed as Record<string, unknown>;
@@ -130,10 +138,10 @@ export class McpStorage {
     }
 
     const content = JSON.stringify(file, null, 2);
-    await this.adapter.write(MCP_CONFIG_PATH, content);
+    await this.adapter.write(configPath, content);
   }
 
   async exists(): Promise<boolean> {
-    return this.adapter.exists(MCP_CONFIG_PATH);
+    return this.adapter.exists(getMcpConfigPath());
   }
 }
