@@ -304,6 +304,12 @@
       "leftSidebar": "Left sidebar",
       "mainTab": "Main editor tab"
     },
+    "claudeHomeDirName": {
+      "name": "Claude home directory name",
+      "desc": "Name of the Claude config directory (e.g. '.claude' or '.claude-internal'). Controls both the global home (~/.claude/) and the vault-level config directory. Requires a restart to take effect.",
+      "validation": "Must start with '.' and contain no path separators",
+      "restartNotice": "Claude home directory changed. Restart Obsidian to apply."
+    },
     "cliPath": {
       "name": "Claude CLI path",
       "desc": "Custom path to Claude Code CLI. Leave empty for auto-detection.",

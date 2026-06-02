@@ -2,7 +2,13 @@ import type { VaultFileAdapter } from '../../../core/storage/VaultFileAdapter';
 import type { AgentDefinition } from '../../../core/types';
 import { serializeAgent } from '../../../utils/agent';
 import { buildAgentFromFrontmatter, parseAgentFile } from '../agents/AgentStorage';
+import { getVaultClaudePath } from '../claudePaths';
 
+export function getAgentsPath(): string {
+  return getVaultClaudePath('agents');
+}
+
+/** @deprecated Use getAgentsPath() instead. Resolves the static default `.claude/agents`. */
 export const AGENTS_PATH = '.claude/agents';
 
 export class AgentVaultStorage {
@@ -12,7 +18,7 @@ export class AgentVaultStorage {
     const agents: AgentDefinition[] = [];
 
     try {
-      const files = await this.adapter.listFiles(AGENTS_PATH);
+      const files = await this.adapter.listFiles(getAgentsPath());
 
       for (const filePath of files) {
         if (!filePath.endsWith('.md')) continue;
@@ -65,16 +71,17 @@ export class AgentVaultStorage {
   }
 
   private resolvePath(agent: AgentDefinition): string {
+    const agentsPath = getAgentsPath();
     if (!agent.filePath) {
-      return `${AGENTS_PATH}/${agent.name}.md`;
+      return `${agentsPath}/${agent.name}.md`;
     }
 
     const normalized = agent.filePath.replace(/\\/g, '/');
-    const idx = normalized.lastIndexOf(`${AGENTS_PATH}/`);
+    const idx = normalized.lastIndexOf(`${agentsPath}/`);
     if (idx !== -1) {
       return normalized.slice(idx);
     }
-    return `${AGENTS_PATH}/${agent.name}.md`;
+    return `${agentsPath}/${agent.name}.md`;
   }
 
   private isFileNotFoundError(error: unknown): boolean {
