@@ -1,4 +1,5 @@
 import type { VaultFileAdapter } from '../../../core/storage/VaultFileAdapter';
+import { getVaultClaudePath } from '../claudePaths';
 import type {
   CCPermissions,
   CCSettings,
@@ -6,6 +7,11 @@ import type {
 } from '../types/settings';
 import { DEFAULT_CC_PERMISSIONS, DEFAULT_CC_SETTINGS } from '../types/settings';
 
+export function getCCSettingsPath(): string {
+  return getVaultClaudePath('settings.json');
+}
+
+/** @deprecated Use getCCSettingsPath() instead. Resolves the static default `.claude/settings.json`. */
 export const CC_SETTINGS_PATH = '.claude/settings.json';
 
 const CC_SETTINGS_SCHEMA = 'https://json.schemastore.org/claude-code-settings.json';
@@ -36,11 +42,12 @@ export class CCSettingsStorage {
   constructor(private adapter: VaultFileAdapter) { }
 
   async load(): Promise<CCSettings> {
-    if (!(await this.adapter.exists(CC_SETTINGS_PATH))) {
+    const settingsPath = getCCSettingsPath();
+    if (!(await this.adapter.exists(settingsPath))) {
       return { ...DEFAULT_CC_SETTINGS };
     }
 
-    const content = await this.adapter.read(CC_SETTINGS_PATH);
+    const content = await this.adapter.read(settingsPath);
     const stored = JSON.parse(content) as Record<string, unknown>;
 
     return {
@@ -53,9 +60,10 @@ export class CCSettingsStorage {
   async save(settings: CCSettings): Promise<void> {
     // Preserve CC-specific fields we don't manage
     let existing: Record<string, unknown> = {};
-    if (await this.adapter.exists(CC_SETTINGS_PATH)) {
+    const settingsPath = getCCSettingsPath();
+    if (await this.adapter.exists(settingsPath)) {
       try {
-        const content = await this.adapter.read(CC_SETTINGS_PATH);
+        const content = await this.adapter.read(settingsPath);
         existing = JSON.parse(content) as Record<string, unknown>;
       } catch {
         // Parse error - start fresh with default settings
@@ -74,11 +82,11 @@ export class CCSettingsStorage {
     }
 
     const content = JSON.stringify(merged, null, 2);
-    await this.adapter.write(CC_SETTINGS_PATH, content);
+    await this.adapter.write(settingsPath, content);
   }
 
   async exists(): Promise<boolean> {
-    return this.adapter.exists(CC_SETTINGS_PATH);
+    return this.adapter.exists(getCCSettingsPath());
   }
 
   async getPermissions(): Promise<CCPermissions> {
