@@ -296,6 +296,12 @@
       "leftSidebar": "左側邊欄",
       "mainTab": "主編輯器分頁"
     },
+    "claudeHomeDirName": {
+      "name": "Claude 主目錄名稱",
+      "desc": "Claude 設定目錄名稱（如 '.claude' 或 '.claude-internal'）。同時控制全域主目錄（~/.claude/）和 Vault 內設定目錄。需要重新啟動才能生效。",
+      "validation": "必須以 '.' 開頭，且不能包含路徑分隔符",
+      "restartNotice": "Claude 主目錄已變更。請重新啟動 Obsidian 以套用。"
+    },
     "cliPath": {
       "name": "Claude CLI 路徑",
       "desc": "Claude Code CLI 的自訂路徑。留空使用自動檢測。",

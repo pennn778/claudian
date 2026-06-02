@@ -1,9 +1,9 @@
 import { existsSync } from 'fs';
 import * as fs from 'fs/promises';
-import * as os from 'os';
 import * as path from 'path';
 
 import type { ProviderConversationSessionAvailability } from '../../../core/providers/types';
+import { getGlobalClaudePath } from '../claudePaths';
 import type { SDKNativeMessage, SDKSessionReadResult } from './sdkHistoryTypes';
 
 export interface SDKSessionLocation {
@@ -22,7 +22,7 @@ export function encodeVaultPathForSDK(vaultPath: string): string {
 }
 
 export function getSDKProjectsPath(): string {
-  return path.join(os.homedir(), '.claude', 'projects');
+  return getGlobalClaudePath('projects');
 }
 
 /** Validates an identifier for safe use in filesystem paths (no traversal, bounded length). */
