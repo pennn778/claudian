@@ -11,6 +11,7 @@ import { Notice } from 'obsidian';
 import * as path from 'path';
 
 import type { PluginInfo, PluginScope } from '../../../core/types';
+import { getVaultClaudePath } from '../claudePaths';
 import { resolveClaudeConfigDir } from '../config/ClaudeConfigDir';
 import type { CCSettingsStorage } from '../storage/CCSettingsStorage';
 import type { InstalledPluginEntry, InstalledPluginsFile } from '../types/plugins';
@@ -132,7 +133,7 @@ export class PluginManager {
   }
 
   private async loadProjectSettings(): Promise<SettingsFile | null> {
-    const projectSettingsPath = path.join(this.vaultPath, '.claude', 'settings.json');
+    const projectSettingsPath = path.join(this.vaultPath, getVaultClaudePath('settings.json'));
     return readJsonFile(projectSettingsPath);
   }
 
