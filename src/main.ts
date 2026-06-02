@@ -64,16 +64,34 @@ export default class ClaudianPlugin extends Plugin {
   private lastKnownTabManagerState: AppTabManagerState | null = null;
 
   async onload() {
-    await this.loadSettings();
+    // Phase 1: settings initialization. Wrapped so a failure (corrupt settings,
+    // storage migration, etc.) never prevents the critical registrations below
+    // from running — otherwise the plugin would silently fail on startup.
+    try {
+      await this.loadSettings();
 
-    // Apply the configurable Claude home directory name (e.g. `.claude-internal`)
-    // before provider initialization, since provider storage/CLI resolution reads
-    // both the global (~/.claude) and vault-level (.claude) paths from it.
-    setClaudeHomeDirName(
-      getClaudeProviderSettings(this.settings as unknown as Record<string, unknown>).claudeHomeDirName,
-    );
+      // Apply the configurable Claude home directory name (e.g. `.claude-internal`)
+      // before provider initialization, since provider storage/CLI resolution reads
+      // both the global (~/.claude) and vault-level (.claude) paths from it.
+      setClaudeHomeDirName(
+        getClaudeProviderSettings(this.settings as unknown as Record<string, unknown>).claudeHomeDirName,
+      );
+    } catch {
+      // Minimum viable state so views/commands can still register.
+      if (!this.storage) {
+        this.storage = new SharedStorageService(this);
+      }
+      if (!this.settings) {
+        this.settings = { ...DEFAULT_CLAUDIAN_SETTINGS } as ClaudianSettings;
+      }
+    }
 
-    await ProviderWorkspaceRegistry.initializeAll(this);
+    // Phase 2: provider workspace initialization (non-fatal; tabs lazily retry).
+    try {
+      await ProviderWorkspaceRegistry.initializeAll(this);
+    } catch {
+      // Non-fatal: provider runtimes initialize lazily on first use.
+    }
 
     this.registerView(
       VIEW_TYPE_CLAUDIAN,
