@@ -95,14 +95,25 @@ export default class ClaudianPlugin extends Plugin {
   async onload() {
     StartupProfiler.startOnload();
     try {
-      await StartupProfiler.runAsync('settings-load', () => this.loadApplication());
-      // Apply the configurable Claude home directory name (e.g. `.claude-internal`)
-      // before lazy provider workspace initialization, since provider storage/CLI
-      // resolution reads both the global (~/.claude) and vault-level (.claude) paths.
-      setClaudeHomeDirName(
-        getClaudeProviderSettings(this.settings as unknown as Record<string, unknown>).claudeHomeDirName,
-      );
+      // Phase 1: settings initialization. Wrapped so a failure (corrupt settings,
+      // storage migration, etc.) never prevents the critical registrations below
+      // from running — otherwise the plugin would silently fail on startup.
+      try {
+        await StartupProfiler.runAsync('settings-load', () => this.loadApplication());
+        // Apply the configurable Claude home directory name (e.g. `.claude-internal`)
+        // before lazy provider workspace initialization, since provider storage/CLI
+        // resolution reads both the global (~/.claude) and vault-level (.claude) paths.
+        setClaudeHomeDirName(
+          getClaudeProviderSettings(this.settings as unknown as Record<string, unknown>).claudeHomeDirName,
+        );
+      } catch {
+        // Minimum viable state so views/commands can still register.
+        if (!this.settings) {
+          this.settings = createDefaultClaudianSettings(getBuiltInProviderDefaultConfigs());
+        }
+      }
       this.zenMode.start();
+
       // Provider workspace services are initialized lazily on first use.
 
       this.registerView(
@@ -115,7 +126,7 @@ export default class ClaudianPlugin extends Plugin {
         getView: () => this.views.getView(),
         registerEvent: eventRef => this.registerEvent(eventRef),
       });
-      this.vaultContentEvents.register(eventRef => this.registerEvent(eventRef));
+      this.vaultContentEvents?.register(eventRef => this.registerEvent(eventRef));
 
       this.addRibbonIcon('bot', 'Open Claudian', () => {
         void this.views.activateView();
@@ -154,7 +165,7 @@ export default class ClaudianPlugin extends Plugin {
 
       this.settingsTab = new ClaudianSettingTab(this.app, this, this.featureHost);
       this.addSettingTab(this.settingsTab);
-      this.sessionMetadata.scheduleRemainingLoad();
+      this.sessionMetadata?.scheduleRemainingLoad();
       this.app.workspace.onLayoutReady(() => {
         if (this.isUnloading || this.sessionInputCleanup || this.sessionInputCleanupTimer !== null) return;
         this.sessionInputCleanupTimer = window.setTimeout(() => {
