@@ -306,6 +306,12 @@
       "leftSidebar": "Barra lateral izquierda",
       "mainTab": "Pestaña del editor principal"
     },
+    "claudeHomeDirName": {
+      "name": "Nombre del directorio principal de Claude",
+      "desc": "Nombre del directorio de configuración de Claude (p. ej., '.claude' o '.claude-internal'). Controla tanto el directorio principal global (~/.claude/) como el directorio de configuración del vault. Requiere reiniciar.",
+      "validation": "Debe comenzar con '.' y no contener separadores de ruta",
+      "restartNotice": "Se cambió el directorio principal de Claude. Reinicia Obsidian para aplicarlo."
+    },
     "cliPath": {
       "name": "Ruta CLI Claude",
       "desc": "Ruta personalizada a Claude Code CLI. Dejar vacío para detección automática.",
