@@ -13,6 +13,7 @@
 
 import type {
   CanUseTool,
+  ModelInfo,
   Options,
   PermissionMode as SDKPermissionMode,
   Query,
@@ -30,6 +31,7 @@ import { ProviderSettingsCoordinator } from '../../../core/providers/ProviderSet
 import type {
   AppAgentManager,
   AppPluginManager,
+  ProviderUIOption,
 } from '../../../core/providers/types';
 import type { ChatRuntime } from '../../../core/runtime/ChatRuntime';
 import type {
@@ -71,6 +73,7 @@ import {
 import { CLAUDE_PROVIDER_CAPABILITIES } from '../capabilities';
 import { loadSubagentFinalResult, loadSubagentToolCalls } from '../history/ClaudeHistoryStore';
 import { createStopSubagentHook, type SubagentHookState } from '../hooks/SubagentHooks';
+import { setRuntimeDetectedClaudeModels } from '../modelOptions';
 import { toClaudeRuntimeModelId } from '../modelSelection';
 import { encodeClaudeTurn } from '../prompt/ClaudeTurnEncoder';
 import { isContextWindowEvent, isSessionInitEvent, isStreamChunk } from '../sdk/typeGuards';
@@ -186,6 +189,9 @@ export class ClaudianService implements ChatRuntime {
 
   // SDK command cache — populated on system/init, cleared on persistent query close
   private cachedSdkCommands: SlashCommand[] = [];
+
+  // SDK model cache — populated on system/init from query.supportedModels()
+  private cachedSdkModels: ProviderUIOption[] = [];
 
   // Subagent hook state provider (set from feature layer to avoid core→feature dependency)
   private _subagentStateProvider: (() => SubagentHookState) | null = null;
@@ -988,6 +994,9 @@ export class ClaudianService implements ChatRuntime {
         // Pass the current query instance so late completions from a dead query
         // cannot overwrite the active cache after a restart or shutdown.
         void this.fetchAndCacheCommands(this.persistentQuery);
+        // Cache the SDK's actual model list so custom CLI builds (e.g.
+        // claude-internal) surface their real models in the dropdown.
+        void this.fetchAndCacheModels(this.persistentQuery);
       } else if (isContextWindowEvent(event)) {
         this.rememberResultContextWindow(event.contextWindow);
         const usageChunk = this.updateBufferedUsageContextWindow(event.contextWindow);
@@ -1833,6 +1842,48 @@ export class ClaudianService implements ChatRuntime {
       }
       this.cachedSdkCommands = mappedCommands;
       return this.cachedSdkCommands;
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Get models the SDK reports as available. Returns the cache populated on
+   * system/init, falling back to a fresh supportedModels() call if the cache
+   * is empty (e.g. the model dropdown is consulted before the first init event).
+   */
+  async getSupportedModels(): Promise<ProviderUIOption[]> {
+    if (this.cachedSdkModels.length > 0) {
+      return this.cachedSdkModels;
+    }
+    if (!this.persistentQuery) {
+      return [];
+    }
+    return this.fetchAndCacheModels(this.persistentQuery);
+  }
+
+  /**
+   * Fetches the SDK model list, caches it, and publishes it to the shared
+   * Claude model-options cache so the (synchronous) dropdown can pick it up.
+   * Called on system/init (fire-and-forget) and as a fallback from
+   * getSupportedModels().
+   */
+  private async fetchAndCacheModels(query: Query | null): Promise<ProviderUIOption[]> {
+    if (!query) return [];
+    try {
+      const sdkModels: ModelInfo[] = await query.supportedModels();
+      const mappedModels: ProviderUIOption[] = sdkModels.map((model) => ({
+        value: model.value,
+        label: model.displayName,
+        description: model.description,
+      }));
+      // Ignore late completions from a query that has since been replaced.
+      if (this.persistentQuery !== query) {
+        return this.cachedSdkModels;
+      }
+      this.cachedSdkModels = mappedModels;
+      setRuntimeDetectedClaudeModels(mappedModels);
+      return this.cachedSdkModels;
     } catch {
       return [];
     }
