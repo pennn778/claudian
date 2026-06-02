@@ -49,6 +49,8 @@ import { type InlineEditContext, InlineEditModal } from './features/inline-edit/
 import { ClaudianSettingTab } from './features/settings/ClaudianSettings';
 import { setLocale } from './i18n/i18n';
 import type { Locale } from './i18n/types';
+import { setClaudeHomeDirName } from './providers/claude/claudePaths';
+import { getClaudeProviderSettings } from './providers/claude/settings';
 import { OPENCODE_PLAN_MODE_ID, OPENCODE_SAFE_MODE_ID } from './providers/opencode/modes';
 import { buildCursorContext } from './utils/editor';
 import { revealWorkspaceLeaf } from './utils/obsidianCompat';
@@ -126,6 +128,13 @@ export default class ClaudianPlugin extends Plugin {
       await StartupProfiler.runAsync(
         'settings-load',
         () => this.loadSettings({ deferNonRestoredSessionMetadata: true }),
+      );
+
+      // Apply the configurable Claude home directory name (e.g. `.claude-internal`)
+      // before provider initialization, since provider storage/CLI resolution reads
+      // both the global (~/.claude) and vault-level (.claude) paths from it.
+      setClaudeHomeDirName(
+        getClaudeProviderSettings(this.settings as unknown as Record<string, unknown>).claudeHomeDirName,
       );
       // Provider workspace services are initialized lazily on first use.
 
