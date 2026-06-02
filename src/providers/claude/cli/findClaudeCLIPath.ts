@@ -3,6 +3,7 @@ import * as os from 'os';
 import * as path from 'path';
 
 import { parsePathEntries, resolveNvmDefaultBin } from '../../../utils/path';
+import { getGlobalClaudePath } from '../claudePaths';
 
 const CLAUDE_CODE_PACKAGE_SEGMENTS = ['node_modules', '@anthropic-ai', 'claude-code'];
 const CLAUDE_CODE_NODE_ENTRYPOINTS = ['cli-wrapper.cjs', 'cli.js'];
@@ -185,7 +186,7 @@ export function findClaudeCLIPath(pathValue?: string): string | null {
   // because it requires shell: true and breaks SDK stdio streaming.
   if (isWindows) {
     const exePaths: string[] = [
-      path.join(homeDir, '.claude', 'local', 'claude.exe'),
+      getGlobalClaudePath('local', 'claude.exe'),
       path.join(homeDir, 'AppData', 'Local', 'Claude', 'claude.exe'),
       path.join(process.env.ProgramFiles || 'C:\\Program Files', 'Claude', 'claude.exe'),
       path.join(process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)', 'Claude', 'claude.exe'),
@@ -208,7 +209,7 @@ export function findClaudeCLIPath(pathValue?: string): string | null {
   }
 
   const commonPaths: string[] = [
-    path.join(homeDir, '.claude', 'local', 'claude'),
+    getGlobalClaudePath('local', 'claude'),
     path.join(homeDir, '.local', 'bin', 'claude'),
     path.join(homeDir, '.volta', 'bin', 'claude'),
     path.join(homeDir, '.asdf', 'shims', 'claude'),
