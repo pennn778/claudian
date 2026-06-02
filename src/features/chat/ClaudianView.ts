@@ -187,6 +187,24 @@ export class ClaudianView extends ItemView {
       return;
     }
 
+    try {
+      await this.initializeView();
+    } catch {
+      // Ensure the user sees a recoverable message rather than a broken panel.
+      const container = this.contentEl ?? this.containerEl;
+      container.empty();
+      container.createDiv({
+        cls: 'claudian-container',
+        text: 'Claudian failed to initialize. Try closing and reopening the panel.',
+      });
+    }
+  }
+
+  private async initializeView(): Promise<void> {
+    if (!this.containerEl) {
+      return;
+    }
+
     // Use contentEl (standard Obsidian API) as primary target.
     // Hover Editor and other plugins may modify the DOM structure,
     // so we need fallbacks to handle non-standard scenarios.
