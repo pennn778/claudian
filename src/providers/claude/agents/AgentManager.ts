@@ -10,11 +10,15 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import type { AgentDefinition, AgentFrontmatter } from '../../../core/types';
+import { getVaultClaudePath } from '../claudePaths';
 import { resolveClaudeConfigDir } from '../config/ClaudeConfigDir';
 import type { PluginManager } from '../plugins/PluginManager';
 import { buildAgentFromFrontmatter, parseAgentFile } from './AgentStorage';
 
-const VAULT_AGENTS_DIR = '.claude/agents';
+function getVaultAgentsDir(): string {
+  return getVaultClaudePath('agents');
+}
+
 const PLUGIN_AGENTS_DIR = 'agents';
 
 // Fallback built-in agent names for before the init message arrives.
@@ -117,7 +121,7 @@ export class AgentManager {
   }
 
   private loadVaultAgents(): void {
-    this.loadAgentsFromDirectory(path.join(this.vaultPath, VAULT_AGENTS_DIR), 'vault');
+    this.loadAgentsFromDirectory(path.join(this.vaultPath, getVaultAgentsDir()), 'vault');
   }
 
   private loadGlobalAgents(): void {
