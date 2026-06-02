@@ -5,6 +5,7 @@ import * as path from 'path';
 import { findBinaryInDirectories, isExistingFile } from '@/utils/cliBinaryLocator';
 import { getEnhancedPath } from '@/utils/env';
 import { parsePathEntries } from '@/utils/path';
+import { getGlobalClaudePath } from '../claudePaths';
 
 const CLAUDE_CODE_PACKAGE_SEGMENTS = ['node_modules', '@anthropic-ai', 'claude-code'];
 const CLAUDE_CODE_NODE_ENTRYPOINTS = ['cli-wrapper.cjs', 'cli.js'];
@@ -146,7 +147,7 @@ export function findClaudeBinaryPath(pathValue?: string): string | null {
     return customResolution;
   }
 
-  const nativeDirectories = [path.join(homeDir, '.claude', 'local')];
+  const nativeDirectories = [getGlobalClaudePath('local')];
   if (isWindows) {
     nativeDirectories.push(
       path.join(homeDir, 'AppData', 'Local', 'Claude'),

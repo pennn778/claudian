@@ -7,6 +7,7 @@ import {
   readStoredString,
 } from '../../core/providers/settings/storedSettings';
 import type { HostnameCLIPaths } from '../../core/types/settings';
+import { isValidClaudeHomeDirName } from './claudePaths';
 import { type ClaudeDiscoveredModel, decodeClaudeModels } from './modelCatalog';
 
 export type ClaudeResponseStyle = 'Default' | 'Concise';
@@ -25,6 +26,7 @@ export interface ClaudeProviderSettings {
   modelAliases: Record<string, string>;
   environmentVariables: string;
   environmentHash: string;
+  claudeHomeDirName: string;
 }
 
 export const DEFAULT_CLAUDE_PROVIDER_SETTINGS: Readonly<ClaudeProviderSettings> = Object.freeze({
@@ -41,6 +43,7 @@ export const DEFAULT_CLAUDE_PROVIDER_SETTINGS: Readonly<ClaudeProviderSettings> 
   modelAliases: {},
   environmentVariables: '',
   environmentHash: '',
+  claudeHomeDirName: '.claude',
 });
 
 export function getClaudeProviderSettings(
@@ -84,7 +87,14 @@ export function getClaudeProviderSettings(
       config.environmentHash,
       DEFAULT_CLAUDE_PROVIDER_SETTINGS.environmentHash,
     ),
+    claudeHomeDirName: normalizeClaudeHomeDirName(config.claudeHomeDirName),
   };
+}
+
+function normalizeClaudeHomeDirName(value: unknown): string {
+  return typeof value === 'string' && isValidClaudeHomeDirName(value)
+    ? value
+    : DEFAULT_CLAUDE_PROVIDER_SETTINGS.claudeHomeDirName;
 }
 
 export function resolveClaudeSettingSources(
