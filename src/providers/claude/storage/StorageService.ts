@@ -10,17 +10,19 @@ import { VaultFileAdapter } from '../../../core/storage/VaultFileAdapter';
 import type {
   SlashCommand,
 } from '../../../core/types';
+import { getVaultClaudeDir } from '../claudePaths';
 import {
   type CCPermissions,
   type CCSettings,
   createPermissionRule,
 } from '../types/settings';
-import { AGENTS_PATH, AgentVaultStorage } from './AgentVaultStorage';
+import { AgentVaultStorage, getAgentsPath } from './AgentVaultStorage';
 import { CCSettingsStorage } from './CCSettingsStorage';
 import { McpStorage } from './McpStorage';
-import { SKILLS_PATH, SkillStorage } from './SkillStorage';
-import { COMMANDS_PATH, SlashCommandStorage } from './SlashCommandStorage';
+import { getSkillsPath, SkillStorage } from './SkillStorage';
+import { getCommandsPath, SlashCommandStorage } from './SlashCommandStorage';
 
+/** @deprecated Use getVaultClaudeDir() from claudePaths instead. Resolves the static default `.claude`. */
 export const CLAUDE_PATH = '.claude';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -74,12 +76,12 @@ export class StorageService {
   }
 
   async ensureDirectories(): Promise<void> {
-    await this.adapter.ensureFolder(CLAUDE_PATH);
+    await this.adapter.ensureFolder(getVaultClaudeDir());
     await this.adapter.ensureFolder(CLAUDIAN_STORAGE_PATH);
-    await this.adapter.ensureFolder(COMMANDS_PATH);
-    await this.adapter.ensureFolder(SKILLS_PATH);
+    await this.adapter.ensureFolder(getCommandsPath());
+    await this.adapter.ensureFolder(getSkillsPath());
     await this.adapter.ensureFolder(SESSIONS_PATH);
-    await this.adapter.ensureFolder(AGENTS_PATH);
+    await this.adapter.ensureFolder(getAgentsPath());
   }
 
   async loadAllSlashCommands(): Promise<SlashCommand[]> {
