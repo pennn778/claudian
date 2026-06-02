@@ -310,6 +310,12 @@
       "leftSidebar": "Barra lateral esquerda",
       "mainTab": "Aba do editor principal"
     },
+    "claudeHomeDirName": {
+      "name": "Nome do diretório base do Claude",
+      "desc": "Nome do diretório de configuração do Claude (por ex., '.claude' ou '.claude-internal'). Controla tanto o diretório base global (~/.claude/) quanto o diretório de configuração do cofre. Requer reinicialização.",
+      "validation": "Deve começar com '.' e não conter separadores de caminho",
+      "restartNotice": "Diretório base do Claude alterado. Reinicie o Obsidian para aplicar."
+    },
     "cliPath": {
       "name": "Caminho CLI Claude",
       "desc": "Caminho personalizado para Claude Code CLI. Deixe vazio para detecção automática.",

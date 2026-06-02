@@ -310,6 +310,12 @@
       "leftSidebar": "左サイドバー",
       "mainTab": "メインエディタタブ"
     },
+    "claudeHomeDirName": {
+      "name": "Claude ホームディレクトリ名",
+      "desc": "Claude 設定ディレクトリの名前（例: '.claude' または '.claude-internal'）。グローバルホーム（~/.claude/）と Vault 内の設定ディレクトリの両方を制御します。適用には再起動が必要です。",
+      "validation": "'.' で始まり、パス区切り文字を含めないでください",
+      "restartNotice": "Claude ホームディレクトリが変更されました。適用するには Obsidian を再起動してください。"
+    },
     "cliPath": {
       "name": "Claude CLI パス",
       "desc": "Claude Code CLI のカスタムパス。空欄で自動検出を使用。",
