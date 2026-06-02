@@ -246,6 +246,10 @@ export type TranslationKey =
   | 'settings.cliPath.descUnix'
   | 'settings.cliPath.validation.notExist'
   | 'settings.cliPath.validation.isDirectory'
+  | 'settings.claudeHomeDirName.name'
+  | 'settings.claudeHomeDirName.desc'
+  | 'settings.claudeHomeDirName.validation'
+  | 'settings.claudeHomeDirName.restartNotice'
 
   // Settings - Language
   | 'settings.language.name'
