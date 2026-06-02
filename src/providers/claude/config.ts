@@ -16,6 +16,7 @@ import {
   readStoredString,
 } from '../../core/providers/settings/storedSettings';
 import type { HostnameCLIPaths } from '../../core/types/settings';
+import { isValidClaudeHomeDirName } from './claudePaths';
 import { type ClaudeDiscoveredModel, decodeClaudeModels } from './models';
 
 type ClaudeSettingSource = 'user' | 'project' | 'local';
@@ -40,6 +41,7 @@ export interface ClaudeProviderSettings extends InstallationSettings, StoredInst
   environmentHash: string;
   /** Fingerprint of session-scope inputs; a change invalidates native bindings. */
   sessionEnvironmentHash: string;
+  claudeHomeDirName: string;
 }
 
 export const DEFAULT_CLAUDE_PROVIDER_SETTINGS: Readonly<ClaudeProviderSettings> = Object.freeze({
@@ -62,6 +64,7 @@ export const DEFAULT_CLAUDE_PROVIDER_SETTINGS: Readonly<ClaudeProviderSettings> 
   environmentVariables: '',
   environmentHash: '',
   sessionEnvironmentHash: '',
+  claudeHomeDirName: '.claude',
 });
 
 export function decodeClaudeConfig(config: Readonly<Record<string, unknown>>): ClaudeProviderSettings {
@@ -110,6 +113,7 @@ export function decodeClaudeConfig(config: Readonly<Record<string, unknown>>): C
       config.sessionEnvironmentHash,
       DEFAULT_CLAUDE_PROVIDER_SETTINGS.sessionEnvironmentHash,
     ),
+    claudeHomeDirName: normalizeClaudeHomeDirName(config.claudeHomeDirName),
   };
 }
 
@@ -144,6 +148,12 @@ function readOutputStyle(config: Readonly<Record<string, unknown>>): string | nu
   if (typeof config.outputStyle === 'string' && config.outputStyle.trim()) return config.outputStyle.trim();
   // The retired `responseStyle` always sent a style; only Concise was a deliberate choice.
   return config.responseStyle === 'Concise' ? 'Concise' : null;
+}
+
+function normalizeClaudeHomeDirName(value: unknown): string {
+  return typeof value === 'string' && isValidClaudeHomeDirName(value)
+    ? value
+    : DEFAULT_CLAUDE_PROVIDER_SETTINGS.claudeHomeDirName;
 }
 
 export function resolveClaudeSettingSources(
