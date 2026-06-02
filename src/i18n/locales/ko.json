@@ -304,6 +304,12 @@
       "leftSidebar": "왼쪽 사이드바",
       "mainTab": "메인 편집기 탭"
     },
+    "claudeHomeDirName": {
+      "name": "Claude 홈 디렉터리 이름",
+      "desc": "Claude 구성 디렉터리 이름(예: '.claude' 또는 '.claude-internal'). 전역 홈(~/.claude/)과 보관소 수준 구성 디렉터리를 모두 제어합니다. 적용하려면 재시작이 필요합니다.",
+      "validation": "'.'로 시작해야 하며 경로 구분자를 포함할 수 없습니다",
+      "restartNotice": "Claude 홈 디렉터리가 변경되었습니다. 적용하려면 Obsidian을 재시작하세요."
+    },
     "cliPath": {
       "name": "Claude CLI 경로",
       "desc": "Claude Code CLI의 사용자 정의 경로. 비워두면 자동 감지 사용.",
