@@ -6,6 +6,7 @@ import {
   getLegacyHostnameKey,
   migrateLegacyHostnameKeyedMap,
 } from '../../utils/env';
+import { isValidClaudeHomeDirName } from './claudePaths';
 
 export const CLAUDE_SAFE_MODES = ['acceptEdits', 'auto', 'default'] as const;
 export type ClaudeSafeMode = typeof CLAUDE_SAFE_MODES[number];
@@ -24,6 +25,7 @@ export interface ClaudeProviderSettings {
   lastModel: string;
   environmentVariables: string;
   environmentHash: string;
+  claudeHomeDirName: string;
 }
 
 export const DEFAULT_CLAUDE_PROVIDER_SETTINGS: Readonly<ClaudeProviderSettings> = Object.freeze({
@@ -39,6 +41,7 @@ export const DEFAULT_CLAUDE_PROVIDER_SETTINGS: Readonly<ClaudeProviderSettings> 
   lastModel: 'haiku',
   environmentVariables: '',
   environmentHash: '',
+  claudeHomeDirName: '.claude',
 });
 
 function normalizeHostnameCliPaths(value: unknown): HostnameCliPaths {
@@ -110,7 +113,14 @@ export function getClaudeProviderSettings(
     environmentHash: (config.environmentHash as string | undefined)
       ?? (settings.lastEnvHash as string | undefined)
       ?? DEFAULT_CLAUDE_PROVIDER_SETTINGS.environmentHash,
+    claudeHomeDirName: normalizeClaudeHomeDirName(config.claudeHomeDirName),
   };
+}
+
+function normalizeClaudeHomeDirName(value: unknown): string {
+  return typeof value === 'string' && isValidClaudeHomeDirName(value)
+    ? value
+    : DEFAULT_CLAUDE_PROVIDER_SETTINGS.claudeHomeDirName;
 }
 
 export function resolveClaudeSettingSources(
