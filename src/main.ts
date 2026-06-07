@@ -108,7 +108,7 @@ import { type InlineEditContext, InlineEditModal } from './features/inline-edit/
 import { ClaudianSettingTab } from './features/settings/ClaudianSettings';
 import { setLocale, t } from './i18n/i18n';
 import type { Locale } from './i18n/types';
-import { setClaudeHomeDirName } from './providers/claude/claudePaths';
+import { setClaudeHomeDirName, setClaudeVaultDirName } from './providers/claude/claudePaths';
 import { getClaudeProviderSettings } from './providers/claude/settings';
 import { deleteLegacyMcpConfig } from './providers/claude/storage/LegacyMcpConfigCleanup';
 import { buildCursorContext } from './utils/editor';
@@ -250,9 +250,13 @@ export default class ClaudianPlugin extends Plugin {
         // Apply the configurable Claude home directory name (e.g. `.claude-internal`)
         // before provider initialization, since provider storage/CLI resolution reads
         // both the global (~/.claude) and vault-level (.claude) paths from it.
-        setClaudeHomeDirName(
-          getClaudeProviderSettings(this.settings as unknown as Record<string, unknown>).claudeHomeDirName,
-        );
+        {
+          const claudeSettings = getClaudeProviderSettings(
+            this.settings as unknown as Record<string, unknown>,
+          );
+          setClaudeHomeDirName(claudeSettings.claudeHomeDirName);
+          setClaudeVaultDirName(claudeSettings.claudeVaultDirName);
+        }
       } catch {
         // Minimum viable state so views/commands can still register.
         if (!this.storage) {
