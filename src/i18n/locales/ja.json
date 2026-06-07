@@ -298,9 +298,13 @@
     },
     "claudeHomeDirName": {
       "name": "Claude ホームディレクトリ名",
-      "desc": "Claude 設定ディレクトリの名前（例: '.claude' または '.claude-internal'）。グローバルホーム（~/.claude/）と Vault 内の設定ディレクトリの両方を制御します。適用には再起動が必要です。",
+      "desc": "グローバル Claude 設定ディレクトリの名前（例: '.claude' または '.claude-internal'）。グローバルホーム（~/.claude/）のみを制御します。適用には再起動が必要です。",
       "validation": "'.' で始まり、パス区切り文字を含めないでください",
       "restartNotice": "Claude ホームディレクトリが変更されました。適用するには Obsidian を再起動してください。"
+    },
+    "claudeVaultDirName": {
+      "name": "Claude Vault ディレクトリ名",
+      "desc": "Vault 内の Claude 設定ディレクトリの名前（例: '.claude' または '.claude-internal'）。エージェント、スキル、コマンド、MCP、設定を保持する Vault 内ディレクトリのみを制御します。適用には再起動が必要です。"
     },
     "cliPath": {
       "name": "Claude CLI パス",
