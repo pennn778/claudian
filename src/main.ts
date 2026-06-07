@@ -43,7 +43,7 @@ import { type InlineEditContext, InlineEditModal } from './features/inline-edit/
 import { ClaudianSettingTab } from './features/settings/ClaudianSettings';
 import { setLocale } from './i18n/i18n';
 import type { Locale } from './i18n/types';
-import { setClaudeHomeDirName } from './providers/claude/claudePaths';
+import { setClaudeHomeDirName, setClaudeVaultDirName } from './providers/claude/claudePaths';
 import { getClaudeProviderSettings } from './providers/claude/settings';
 import { OPENCODE_PLAN_MODE_ID, OPENCODE_SAFE_MODE_ID } from './providers/opencode/modes';
 import { extractUserDisplayContent } from './utils/context';
@@ -70,12 +70,18 @@ export default class ClaudianPlugin extends Plugin {
     try {
       await this.loadSettings();
 
-      // Apply the configurable Claude home directory name (e.g. `.claude-internal`)
-      // before provider initialization, since provider storage/CLI resolution reads
-      // both the global (~/.claude) and vault-level (.claude) paths from it.
-      setClaudeHomeDirName(
-        getClaudeProviderSettings(this.settings as unknown as Record<string, unknown>).claudeHomeDirName,
-      );
+      // Apply the configurable Claude directory names (e.g. `.claude-internal`)
+      // before provider initialization, since provider storage/CLI resolution
+      // reads both the global (~/.claude) and vault-level (.claude) paths. The
+      // global home and the in-vault config directory are configured
+      // independently so a custom global home can coexist with `.claude/`.
+      {
+        const claudeSettings = getClaudeProviderSettings(
+          this.settings as unknown as Record<string, unknown>,
+        );
+        setClaudeHomeDirName(claudeSettings.claudeHomeDirName);
+        setClaudeVaultDirName(claudeSettings.claudeVaultDirName);
+      }
     } catch {
       // Minimum viable state so views/commands can still register.
       if (!this.storage) {
