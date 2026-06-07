@@ -177,6 +177,43 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
         text.inputEl.addClass('claudian-settings-claude-home-input');
       });
 
+    // Vault-level Claude config directory name, decoupled from the global home
+    // so a custom global home (e.g. ~/.claude-internal/) can keep the
+    // conventional in-vault `.claude/` directory. Requires a restart.
+    const claudeVaultDirValidationEl = container.createDiv({
+      cls: 'claudian-claude-home-validation claudian-setting-validation claudian-setting-validation-error claudian-hidden',
+    });
+
+    new Setting(container)
+      .setName(t('settings.claudeVaultDirName.name'))
+      .setDesc(t('settings.claudeVaultDirName.desc'))
+      .addText((text) => {
+        text
+          // eslint-disable-next-line obsidianmd/ui/sentence-case -- placeholder is a literal directory name
+          .setPlaceholder('.claude')
+          .setValue(claudeSettings.claudeVaultDirName)
+          .onChange(async (value) => {
+            const trimmed = value.trim();
+
+            if (trimmed && !isValidClaudeHomeDirName(trimmed)) {
+              claudeVaultDirValidationEl.setText(t('settings.claudeHomeDirName.validation'));
+              claudeVaultDirValidationEl.toggleClass('claudian-hidden', false);
+              return;
+            }
+
+            claudeVaultDirValidationEl.toggleClass('claudian-hidden', true);
+            const dirName = trimmed || '.claude';
+
+            // Persist only — path resolution is fixed at load time; a restart is
+            // required to apply.
+            updateClaudeProviderSettings(settingsBag, { claudeVaultDirName: dirName });
+            await context.plugin.saveSettings();
+
+            new Notice(t('settings.claudeHomeDirName.restartNotice'));
+          });
+        text.inputEl.addClass('claudian-settings-claude-home-input');
+      });
+
     // --- Safety ---
 
     new Setting(container).setName(t('settings.safety')).setHeading();
