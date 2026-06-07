@@ -306,9 +306,13 @@
     },
     "claudeHomeDirName": {
       "name": "Nome do diretório base do Claude",
-      "desc": "Nome do diretório de configuração do Claude (por ex., '.claude' ou '.claude-internal'). Controla tanto o diretório base global (~/.claude/) quanto o diretório de configuração do cofre. Requer reinicialização.",
+      "desc": "Nome do diretório de configuração global do Claude (por ex., '.claude' ou '.claude-internal'). Controla apenas o diretório base global (~/.claude/). Requer reinicialização.",
       "validation": "Deve começar com '.' e não conter separadores de caminho",
       "restartNotice": "Diretório base do Claude alterado. Reinicie o Obsidian para aplicar."
+    },
+    "claudeVaultDirName": {
+      "name": "Nome do diretório do Claude no cofre",
+      "desc": "Nome do diretório de configuração do Claude dentro do cofre (por ex., '.claude' ou '.claude-internal'). Controla apenas o diretório do cofre que contém agentes, habilidades, comandos, MCP e configurações. Requer reinicialização."
     },
     "cliPath": {
       "name": "Caminho CLI Claude",
