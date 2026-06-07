@@ -312,9 +312,13 @@
     },
     "claudeHomeDirName": {
       "name": "Name des Claude-Home-Verzeichnisses",
-      "desc": "Name des Claude-Konfigurationsverzeichnisses (z. B. '.claude' oder '.claude-internal'). Steuert sowohl das globale Home (~/.claude/) als auch das Konfigurationsverzeichnis im Vault. Erfordert einen Neustart.",
+      "desc": "Name des globalen Claude-Konfigurationsverzeichnisses (z. B. '.claude' oder '.claude-internal'). Steuert nur das globale Home (~/.claude/). Erfordert einen Neustart.",
       "validation": "Muss mit '.' beginnen und darf keine Pfadtrennzeichen enthalten",
       "restartNotice": "Claude-Home-Verzeichnis geändert. Starten Sie Obsidian neu, um es anzuwenden."
+    },
+    "claudeVaultDirName": {
+      "name": "Name des Claude-Vault-Verzeichnisses",
+      "desc": "Name des Claude-Konfigurationsverzeichnisses im Vault (z. B. '.claude' oder '.claude-internal'). Steuert nur das Vault-Verzeichnis mit Agenten, Skills, Befehlen, MCP und Einstellungen. Erfordert einen Neustart."
     },
     "cliPath": {
       "name": "Claude CLI-Pfad",
