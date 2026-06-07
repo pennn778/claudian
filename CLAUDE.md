@@ -75,6 +75,28 @@ Tests mirror the `src/` layout under `tests/unit/` and `tests/integration/`. Jes
 | `~/.claude/projects/{vault}/*.jsonl` | Claude-native transcripts |
 | `~/.codex/sessions/**/*.jsonl` | Codex-native transcripts |
 
+## Branching & Upstream Sync
+
+This repo is a fork. `origin` is the upstream (`YishenTu/claudian`); `myfork` is the working remote (`pennn778/claudian`). Two long-lived branches:
+
+- `main` — pristine mirror of `origin/main`. Never commit here.
+- `custom` — where local customizations live; periodically rebased onto fresh `main`.
+
+`branch.{main,custom}.pushRemote` is set to `myfork`, so `git push` never reaches upstream.
+
+**Sync upstream** (when `origin/main` advances):
+
+```bash
+git fetch origin
+git checkout main
+git merge --ff-only origin/main
+git checkout custom
+git rebase main                           # resolve conflicts if any
+git push myfork custom --force-with-lease
+```
+
+**Adding a customization**: commit on `custom`, then `git push` (defaults to `myfork`).
+
 ## Development Notes
 
 - **Provider-native first**: Prefer the official Claude SDK and Codex app-server behavior over reimplementing provider features locally. When the provider already owns a capability, adapt to it instead of shadowing it.
