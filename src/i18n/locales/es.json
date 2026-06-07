@@ -308,9 +308,13 @@
     },
     "claudeHomeDirName": {
       "name": "Nombre del directorio principal de Claude",
-      "desc": "Nombre del directorio de configuración de Claude (p. ej., '.claude' o '.claude-internal'). Controla tanto el directorio principal global (~/.claude/) como el directorio de configuración del vault. Requiere reiniciar.",
+      "desc": "Nombre del directorio de configuración global de Claude (p. ej., '.claude' o '.claude-internal'). Controla solo el directorio principal global (~/.claude/). Requiere reiniciar.",
       "validation": "Debe comenzar con '.' y no contener separadores de ruta",
       "restartNotice": "Se cambió el directorio principal de Claude. Reinicia Obsidian para aplicarlo."
+    },
+    "claudeVaultDirName": {
+      "name": "Nombre del directorio de Claude en el vault",
+      "desc": "Nombre del directorio de configuración de Claude dentro del vault (p. ej., '.claude' o '.claude-internal'). Controla solo el directorio del vault que contiene agentes, habilidades, comandos, MCP y ajustes. Requiere reiniciar."
     },
     "cliPath": {
       "name": "Ruta CLI Claude",
