@@ -1,5 +1,5 @@
 import type { ProviderCapabilities } from '../../core/providers/types';
-import { getClaudeHomeDirName } from './claudePaths';
+import { getVaultClaudeDir } from './claudePaths';
 
 export const CLAUDE_PROVIDER_CAPABILITIES: Readonly<ProviderCapabilities> = Object.freeze({
   providerId: 'claude',
@@ -14,9 +14,9 @@ export const CLAUDE_PROVIDER_CAPABILITIES: Readonly<ProviderCapabilities> = Obje
   supportsMcpTools: true,
   supportsTurnSteer: false,
   reasoningControl: 'effort',
-  // Resolved lazily so a configured Claude home directory name (e.g.
-  // `.claude-internal`) is reflected in plan-file path detection.
+  // Plans live in the vault, so this tracks the vault config directory name
+  // (e.g. `.claude-internal`) rather than the global home name.
   get planPathPrefix(): string {
-    return `/${getClaudeHomeDirName()}/plans/`;
+    return `/${getVaultClaudeDir()}/plans/`;
   },
 });
