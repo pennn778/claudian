@@ -3,17 +3,20 @@ import * as path from 'path';
 
 import {
   getClaudeHomeDirName,
+  getClaudeVaultDirName,
   getGlobalClaudeHome,
   getGlobalClaudePath,
   getVaultClaudeDir,
   getVaultClaudePath,
   isValidClaudeHomeDirName,
   setClaudeHomeDirName,
+  setClaudeVaultDirName,
 } from '@/providers/claude/claudePaths';
 
 describe('claudePaths', () => {
   afterEach(() => {
     setClaudeHomeDirName('.claude');
+    setClaudeVaultDirName('.claude');
   });
 
   describe('isValidClaudeHomeDirName', () => {
@@ -47,6 +50,30 @@ describe('claudePaths', () => {
       setClaudeHomeDirName('invalid/name');
       expect(getClaudeHomeDirName()).toBe('.claude-internal');
     });
+
+    it('does not affect the vault directory name', () => {
+      setClaudeHomeDirName('.claude-internal');
+      expect(getClaudeVaultDirName()).toBe('.claude');
+      expect(getVaultClaudeDir()).toBe('.claude');
+    });
+  });
+
+  describe('setClaudeVaultDirName / getClaudeVaultDirName', () => {
+    it('defaults to .claude', () => {
+      expect(getClaudeVaultDirName()).toBe('.claude');
+    });
+
+    it('can be set independently of the global home name', () => {
+      setClaudeVaultDirName('.claude-internal');
+      expect(getClaudeVaultDirName()).toBe('.claude-internal');
+      expect(getClaudeHomeDirName()).toBe('.claude');
+    });
+
+    it('ignores invalid values', () => {
+      setClaudeVaultDirName('.claude-internal');
+      setClaudeVaultDirName('invalid/name');
+      expect(getClaudeVaultDirName()).toBe('.claude-internal');
+    });
   });
 
   describe('getGlobalClaudeHome', () => {
@@ -67,10 +94,17 @@ describe('claudePaths', () => {
       );
     });
 
-    it('uses the custom dir name', () => {
+    it('uses the custom global dir name', () => {
       setClaudeHomeDirName('.claude-internal');
       expect(getGlobalClaudePath('agents')).toBe(
         path.join(os.homedir(), '.claude-internal', 'agents'),
+      );
+    });
+
+    it('is unaffected by the vault dir name', () => {
+      setClaudeVaultDirName('.claude-internal');
+      expect(getGlobalClaudePath('agents')).toBe(
+        path.join(os.homedir(), '.claude', 'agents'),
       );
     });
   });
@@ -81,36 +115,42 @@ describe('claudePaths', () => {
       expect(getVaultClaudePath('settings.json')).toBe('.claude/settings.json');
     });
 
-    it('uses the custom dir name', () => {
-      setClaudeHomeDirName('.claude-internal');
+    it('uses the custom vault dir name', () => {
+      setClaudeVaultDirName('.claude-internal');
       expect(getVaultClaudeDir()).toBe('.claude-internal');
       expect(getVaultClaudePath('sessions', 'abc.jsonl')).toBe('.claude-internal/sessions/abc.jsonl');
+    });
+
+    it('is unaffected by the global home name', () => {
+      setClaudeHomeDirName('.claude-internal');
+      expect(getVaultClaudeDir()).toBe('.claude');
+      expect(getVaultClaudePath('settings.json')).toBe('.claude/settings.json');
     });
   });
 
   describe('dynamic path functions in Claude storage modules', () => {
-    it('getCCSettingsPath responds to dir name changes', async () => {
+    it('getCCSettingsPath responds to vault dir name changes', async () => {
       const { getCCSettingsPath } = await import('@/providers/claude/storage/CCSettingsStorage');
       expect(getCCSettingsPath()).toBe('.claude/settings.json');
 
-      setClaudeHomeDirName('.claude-internal');
+      setClaudeVaultDirName('.claude-internal');
       expect(getCCSettingsPath()).toBe('.claude-internal/settings.json');
     });
 
-    it('getAgentsPath / getSkillsPath / getCommandsPath / getMcpConfigPath respond to dir name changes', async () => {
+    it('getAgentsPath / getSkillsPath / getCommandsPath / getMcpConfigPath respond to vault dir name changes', async () => {
       const { getAgentsPath } = await import('@/providers/claude/storage/AgentVaultStorage');
       const { getSkillsPath } = await import('@/providers/claude/storage/SkillStorage');
       const { getCommandsPath } = await import('@/providers/claude/storage/SlashCommandStorage');
       const { getMcpConfigPath } = await import('@/providers/claude/storage/McpStorage');
 
-      setClaudeHomeDirName('.claude-internal');
+      setClaudeVaultDirName('.claude-internal');
       expect(getAgentsPath()).toBe('.claude-internal/agents');
       expect(getSkillsPath()).toBe('.claude-internal/skills');
       expect(getCommandsPath()).toBe('.claude-internal/commands');
       expect(getMcpConfigPath()).toBe('.claude-internal/mcp.json');
     });
 
-    it('getSDKProjectsPath responds to dir name changes', async () => {
+    it('getSDKProjectsPath responds to global dir name changes', async () => {
       const { getSDKProjectsPath } = await import('@/providers/claude/history/sdkSessionPaths');
       expect(getSDKProjectsPath()).toBe(path.join(os.homedir(), '.claude', 'projects'));
 
