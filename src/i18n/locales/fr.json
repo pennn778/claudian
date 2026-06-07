@@ -300,9 +300,13 @@
     },
     "claudeHomeDirName": {
       "name": "Nom du répertoire principal de Claude",
-      "desc": "Nom du répertoire de configuration de Claude (par ex. '.claude' ou '.claude-internal'). Contrôle à la fois le répertoire principal global (~/.claude/) et le répertoire de configuration du coffre. Nécessite un redémarrage.",
+      "desc": "Nom du répertoire de configuration global de Claude (par ex. '.claude' ou '.claude-internal'). Contrôle uniquement le répertoire principal global (~/.claude/). Nécessite un redémarrage.",
       "validation": "Doit commencer par '.' et ne contenir aucun séparateur de chemin",
       "restartNotice": "Répertoire principal de Claude modifié. Redémarrez Obsidian pour l'appliquer."
+    },
+    "claudeVaultDirName": {
+      "name": "Nom du répertoire Claude du coffre",
+      "desc": "Nom du répertoire de configuration de Claude dans le coffre (par ex. '.claude' ou '.claude-internal'). Contrôle uniquement le répertoire du coffre contenant les agents, compétences, commandes, MCP et paramètres. Nécessite un redémarrage."
     },
     "cliPath": {
       "name": "Chemin CLI Claude",
