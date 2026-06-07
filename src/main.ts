@@ -55,7 +55,7 @@ import { ZenModeController } from './features/chat/zen/ZenModeController';
 import { createInlineEditCommand } from './features/inline-edit/inlineEditCommand';
 import { InlineEditSessionOwner } from './features/inline-edit/InlineEditSessionOwner';
 import { ClaudianSettingTab } from './features/settings/ClaudianSettings';
-import { setClaudeHomeDirName } from './providers/claude/claudePaths';
+import { setClaudeHomeDirName, setClaudeVaultDirName } from './providers/claude/claudePaths';
 import { getClaudeProviderSettings } from './providers/claude/settings';
 import { getBuiltInProviderDefaultConfigs } from './providers/defaultProviderConfigs';
 
@@ -131,12 +131,16 @@ export default class ClaudianPlugin extends Plugin {
         }
         // Unloaded while loading: shutdown owns the domains just built, and nothing may register after cleanup ran.
         if (this.isUnloading) return;
-        // Apply the configurable Claude home directory name (e.g. `.claude-internal`)
+        // Apply the configurable Claude home/vault directory names (e.g. `.claude-internal`)
         // before lazy provider workspace initialization, since provider storage/CLI
         // resolution reads both the global (~/.claude) and vault-level (.claude) paths.
-        setClaudeHomeDirName(
-          getClaudeProviderSettings(this.settings as unknown as Record<string, unknown>).claudeHomeDirName,
-        );
+        {
+          const claudeSettings = getClaudeProviderSettings(
+            this.settings as unknown as Record<string, unknown>,
+          );
+          setClaudeHomeDirName(claudeSettings.claudeHomeDirName);
+          setClaudeVaultDirName(claudeSettings.claudeVaultDirName);
+        }
       } catch {
         // Minimum viable state so views/commands can still register.
         if (!this.settings) {
