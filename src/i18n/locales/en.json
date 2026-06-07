@@ -308,9 +308,13 @@
     },
     "claudeHomeDirName": {
       "name": "Claude home directory name",
-      "desc": "Name of the Claude config directory (e.g. '.claude' or '.claude-internal'). Controls both the global home (~/.claude/) and the vault-level config directory. Requires a restart to take effect.",
+      "desc": "Name of the global Claude config directory (e.g. '.claude' or '.claude-internal'). Controls the global home (~/.claude/) only. Requires a restart to take effect.",
       "validation": "Must start with '.' and contain no path separators",
       "restartNotice": "Claude home directory changed. Restart Obsidian to apply."
+    },
+    "claudeVaultDirName": {
+      "name": "Claude vault directory name",
+      "desc": "Name of the in-vault Claude config directory (e.g. '.claude' or '.claude-internal'). Controls only the vault-level directory holding agents, skills, commands, MCP, and settings. Requires a restart to take effect."
     },
     "cliPath": {
       "name": "Claude CLI path",

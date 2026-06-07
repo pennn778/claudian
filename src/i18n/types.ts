@@ -248,6 +248,8 @@ export type TranslationKey =
   | 'settings.claudeHomeDirName.desc'
   | 'settings.claudeHomeDirName.validation'
   | 'settings.claudeHomeDirName.restartNotice'
+  | 'settings.claudeVaultDirName.name'
+  | 'settings.claudeVaultDirName.desc'
 
   // Settings - Language
   | 'settings.language.name'
