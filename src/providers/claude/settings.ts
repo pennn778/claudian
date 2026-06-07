@@ -33,6 +33,7 @@ export interface ClaudeProviderSettings {
   /** Fingerprint of session-scope inputs; a change invalidates native bindings. */
   sessionEnvironmentHash: string;
   claudeHomeDirName: string;
+  claudeVaultDirName: string;
 }
 
 export const DEFAULT_CLAUDE_PROVIDER_SETTINGS: Readonly<ClaudeProviderSettings> = Object.freeze({
@@ -53,6 +54,7 @@ export const DEFAULT_CLAUDE_PROVIDER_SETTINGS: Readonly<ClaudeProviderSettings> 
   environmentHash: '',
   sessionEnvironmentHash: '',
   claudeHomeDirName: '.claude',
+  claudeVaultDirName: '.claude',
 });
 
 export function getClaudeProviderSettings(
@@ -102,7 +104,14 @@ export function getClaudeProviderSettings(
       config.sessionEnvironmentHash,
       DEFAULT_CLAUDE_PROVIDER_SETTINGS.sessionEnvironmentHash,
     ),
-    claudeHomeDirName: normalizeClaudeHomeDirName(config.claudeHomeDirName),
+    claudeHomeDirName: normalizeClaudeHomeDirName(
+      config.claudeHomeDirName,
+      DEFAULT_CLAUDE_PROVIDER_SETTINGS.claudeHomeDirName,
+    ),
+    claudeVaultDirName: normalizeClaudeHomeDirName(
+      config.claudeVaultDirName,
+      DEFAULT_CLAUDE_PROVIDER_SETTINGS.claudeVaultDirName,
+    ),
   };
 }
 
@@ -121,10 +130,10 @@ function readOutputStyle(config: Record<string, unknown>): string | null {
   return config.responseStyle === 'Concise' ? 'Concise' : null;
 }
 
-function normalizeClaudeHomeDirName(value: unknown): string {
+function normalizeClaudeHomeDirName(value: unknown, fallback: string): string {
   return typeof value === 'string' && isValidClaudeHomeDirName(value)
     ? value
-    : DEFAULT_CLAUDE_PROVIDER_SETTINGS.claudeHomeDirName;
+    : fallback;
 }
 
 export function resolveClaudeSettingSources(
