@@ -38,6 +38,7 @@ import type { Locale } from './i18n/types';
 import { setClaudeHomeDirName, setClaudeVaultDirName } from './providers/claude/claudePaths';
 import { getClaudeProviderSettings } from './providers/claude/settings';
 import { OPENCODE_PLAN_MODE_ID, OPENCODE_SAFE_MODE_ID } from './providers/opencode/modes';
+import { extractUserDisplayContent } from './utils/context';
 import { buildCursorContext } from './utils/editor';
 import { revealWorkspaceLeaf } from './utils/obsidianCompat';
 import { getVaultPath } from './utils/path';
@@ -621,7 +622,10 @@ export default class ClaudianPlugin extends Plugin {
     if (!firstUserMsg) {
       return 'New conversation';
     }
-    return firstUserMsg.content.substring(0, 50) + (firstUserMsg.content.length > 50 ? '...' : '');
+    const previewText = firstUserMsg.displayContent
+      ?? extractUserDisplayContent(firstUserMsg.content)
+      ?? firstUserMsg.content;
+    return previewText.substring(0, 50) + (previewText.length > 50 ? '...' : '');
   }
 
   private async loadSdkMessagesForConversation(conversation: Conversation): Promise<void> {
