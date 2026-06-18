@@ -3,6 +3,7 @@ import {
   getRuntimeDetectedClaudeModels,
   setRuntimeDetectedClaudeModels,
 } from '@/providers/claude/modelOptions';
+import { toClaudeRuntimeModelId } from '@/providers/claude/modelSelection';
 
 describe('modelOptions runtime-detected models', () => {
   afterEach(() => {
@@ -43,7 +44,7 @@ describe('modelOptions runtime-detected models', () => {
       },
     });
 
-    expect(options.some((o) => o.value === 'env-model')).toBe(true);
+    expect(options.some((o) => toClaudeRuntimeModelId(o.value) === 'env-model')).toBe(true);
     expect(options.some((o) => o.value === 'internal-opus')).toBe(false);
   });
 });
