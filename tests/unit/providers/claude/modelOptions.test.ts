@@ -43,7 +43,7 @@ describe('modelOptions runtime-detected models', () => {
       },
     });
 
-    expect(options.some((o) => o.value === 'env-model')).toBe(true);
+    expect(options.some((o) => o.value === 'claude-code/env-model')).toBe(true);
     expect(options.some((o) => o.value === 'internal-opus')).toBe(false);
   });
 });
