@@ -1,6 +1,8 @@
 import * as os from 'os';
 import * as path from 'path';
 
+import { getClaudeHomeDirName } from '../claudePaths';
+
 export interface ClaudeConfigDirContext {
   environment?: NodeJS.ProcessEnv;
   hostPlatform?: NodeJS.Platform;
@@ -42,8 +44,11 @@ export function resolveClaudeConfigDir(context?: ClaudeConfigDirContext): string
     const homeDir = context?.environment
       ? resolveSdkHomeDir(environment, context.hostPlatform ?? process.platform)
       : os.homedir();
+    // Honor the configurable Claude home directory name (default '.claude') so
+    // custom CLI builds (e.g. claude-internal storing data in ~/.claude-internal/)
+    // resolve correctly. An explicit CLAUDE_CONFIG_DIR still takes precedence.
     return resolveFromSdkWorkingDirectory(
-      path.join(homeDir, '.claude'),
+      path.join(homeDir, getClaudeHomeDirName()),
       context?.vaultPath,
     );
   }
