@@ -1,6 +1,8 @@
 import * as os from 'os';
 import * as path from 'path';
 
+import { getClaudeHomeDirName } from '../claudePaths';
+
 export interface ClaudeConfigDirContext {
   environment?: NodeJS.ProcessEnv;
   hostPlatform?: NodeJS.Platform;
@@ -43,7 +45,7 @@ export function resolveClaudeConfigDir(context?: ClaudeConfigDirContext): string
       ? resolveSdkHomeDir(environment, context.hostPlatform ?? process.platform)
       : os.homedir();
     return resolveFromSdkWorkingDirectory(
-      path.join(homeDir, '.claude'),
+      path.join(homeDir, getClaudeHomeDirName()),
       context?.vaultPath,
     );
   }
