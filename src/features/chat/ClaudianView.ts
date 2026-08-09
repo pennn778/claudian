@@ -211,7 +211,11 @@ export class ClaudianView extends ItemView implements ZenModeSource {
     }
 
     try {
-      await this.initializeView();
+      await this.initializeView(
+        lifecycleRevision,
+        previousLifecycleWasClosing,
+        shutdownSnapshotPromise,
+      );
     } catch {
       // Ensure the user sees a recoverable message rather than a broken panel.
       const container = this.contentEl ?? this.containerEl;
@@ -223,7 +227,11 @@ export class ClaudianView extends ItemView implements ZenModeSource {
     }
   }
 
-  private async initializeView(): Promise<void> {
+  private async initializeView(
+    lifecycleRevision: number,
+    previousLifecycleWasClosing: boolean,
+    shutdownSnapshotPromise: Promise<void> | null,
+  ): Promise<void> {
     if (!this.containerEl) {
       return;
     }
