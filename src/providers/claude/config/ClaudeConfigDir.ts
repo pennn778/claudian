@@ -5,6 +5,7 @@ import { resolveExecutionTarget } from '@/core/process/execution-target/Executio
 import type { ExecutionTarget } from '@/core/process/execution-target/types';
 import { createExecutionPathMapper } from '@/core/process/execution-target/WSLPathMapper';
 
+import { getClaudeHomeDirName } from '../claudePaths';
 import { decodeClaudeConfig } from '../config';
 
 export interface ClaudeConfigDirContext {
@@ -65,7 +66,7 @@ export function resolveClaudeConfigDir(context?: ClaudeConfigDirContext): string
       }
     } else {
       if (!environment.HOME?.startsWith('/')) throw new Error('Unable to resolve Claude Code Linux HOME');
-      directory = path.posix.join(environment.HOME, '.claude');
+      directory = path.posix.join(environment.HOME, getClaudeHomeDirName());
     }
     const hostDirectory = mapper.toHostPath(directory);
     if (!hostDirectory) throw new Error('Unable to map Claude Code config directory to the host');
@@ -77,7 +78,7 @@ export function resolveClaudeConfigDir(context?: ClaudeConfigDirContext): string
       ? resolveSDKHomeDir(environment, context.hostPlatform ?? process.platform)
       : os.homedir();
     return resolveFromSDKWorkingDirectory(
-      path.join(homeDir, '.claude'),
+      path.join(homeDir, getClaudeHomeDirName()),
       context?.vaultPath,
     );
   }
