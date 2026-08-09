@@ -170,8 +170,9 @@ export function createClaudeSettingsTabRenderer(
 
               // Persist only — do NOT call setClaudeHomeDirName() here. Path
               // resolution is fixed at load time; a restart is required to apply.
-              updateClaudeProviderSettings(settingsBag, { claudeHomeDirName: dirName });
-              await context.plugin.saveSettings();
+              await context.plugin.mutateSettings((settings) => {
+                updateClaudeProviderSettings(settings, { claudeHomeDirName: dirName });
+              });
 
               new Notice(t('settings.claudeHomeDirName.restartNotice'));
             });
@@ -207,8 +208,9 @@ export function createClaudeSettingsTabRenderer(
 
               // Persist only — path resolution is fixed at load time; a restart is
               // required to apply.
-              updateClaudeProviderSettings(settingsBag, { claudeVaultDirName: dirName });
-              await context.plugin.saveSettings();
+              await context.plugin.mutateSettings((settings) => {
+                updateClaudeProviderSettings(settings, { claudeVaultDirName: dirName });
+              });
 
               new Notice(t('settings.claudeHomeDirName.restartNotice'));
             });
