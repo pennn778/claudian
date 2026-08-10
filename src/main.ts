@@ -104,9 +104,7 @@ export default class ClaudianPlugin extends Plugin {
         // before lazy provider workspace initialization, since provider storage/CLI
         // resolution reads both the global (~/.claude) and vault-level (.claude) paths.
         {
-          const claudeSettings = getClaudeProviderSettings(
-            this.settings as unknown as Record<string, unknown>,
-          );
+          const claudeSettings = getClaudeProviderSettings(this.settings);
           setClaudeHomeDirName(claudeSettings.claudeHomeDirName);
           setClaudeVaultDirName(claudeSettings.claudeVaultDirName);
         }
