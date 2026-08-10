@@ -164,9 +164,7 @@ export default class ClaudianPlugin extends Plugin {
         // before provider initialization, since provider storage/CLI resolution reads
         // both the global (~/.claude) and vault-level (.claude) paths from it.
         {
-          const claudeSettings = getClaudeProviderSettings(
-            this.settings as unknown as Record<string, unknown>,
-          );
+          const claudeSettings = getClaudeProviderSettings(this.settings);
           setClaudeHomeDirName(claudeSettings.claudeHomeDirName);
           setClaudeVaultDirName(claudeSettings.claudeVaultDirName);
         }
@@ -176,7 +174,7 @@ export default class ClaudianPlugin extends Plugin {
           this.storage = new SharedStorageService(this);
         }
         if (!this.settings) {
-          this.settings = { ...DEFAULT_CLAUDIAN_SETTINGS } as ClaudianSettings;
+          this.settings = { ...DEFAULT_CLAUDIAN_SETTINGS };
         }
       }
       this.zenMode.start();
