@@ -36,3 +36,25 @@ npm run typecheck && npm run lint && npm run test && npm run build && npm run ch
 
 - Keep non-obvious constraints at their narrowest common scope, with one authoritative home and explicit exceptions. Remove implementation inventories, generic advice, inherited duplicates, and retired decisions.
 - Each guide has a sibling `CLAUDE.md` containing only `@AGENTS.md`.
+
+## Branching & Upstream Sync
+
+This repo is a fork. `origin` is the upstream (`YishenTu/claudian`); `myfork` is the working remote (`pennn778/claudian`). Two long-lived branches:
+
+- `main` — pristine mirror of `origin/main`. Never commit here.
+- `custom` — where local customizations live; periodically rebased onto fresh `main`.
+
+`branch.{main,custom}.pushRemote` is set to `myfork`, so `git push` never reaches upstream.
+
+**Sync upstream** (when `origin/main` advances):
+
+```bash
+git fetch origin
+git checkout main
+git merge --ff-only origin/main
+git checkout custom
+git rebase main                           # resolve conflicts if any
+git push myfork custom --force-with-lease
+```
+
+**Adding a customization**: commit on `custom`, then `git push` (defaults to `myfork`).
