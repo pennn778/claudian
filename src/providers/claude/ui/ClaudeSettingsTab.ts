@@ -12,7 +12,7 @@ import { renderLastEnabledProviderWarning } from '../../../shared/settings/Provi
 import { getHostnameKey } from '../../../utils/env';
 import { expandHomePath } from '../../../utils/path';
 import { getClaudeWorkspaceServices } from '../app/ClaudeWorkspaceServices';
-import { isValidClaudeHomeDirName } from '../claudePaths';
+import { DEFAULT_CLAUDE_DIR_NAME, isValidClaudeHomeDirName } from '../claudePaths';
 import {
   getClaudeModelOptions,
   resolveClaudeModelEnvironmentTypePreference,
@@ -154,8 +154,7 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
       .setDesc(t('settings.claudeHomeDirName.desc'))
       .addText((text) => {
         text
-          // eslint-disable-next-line obsidianmd/ui/sentence-case -- placeholder is a literal directory name
-          .setPlaceholder('.claude')
+          .setPlaceholder(DEFAULT_CLAUDE_DIR_NAME)
           .setValue(claudeSettings.claudeHomeDirName)
           .onChange(async (value) => {
             const trimmed = value.trim();
@@ -167,7 +166,7 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
             }
 
             claudeHomeDirValidationEl.toggleClass('claudian-hidden', true);
-            const dirName = trimmed || '.claude';
+            const dirName = trimmed || DEFAULT_CLAUDE_DIR_NAME;
 
             // Persist only — do NOT call setClaudeHomeDirName() here. Path
             // resolution is fixed at load time; a restart is required to apply.
@@ -192,8 +191,7 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
       .setDesc(t('settings.claudeVaultDirName.desc'))
       .addText((text) => {
         text
-          // eslint-disable-next-line obsidianmd/ui/sentence-case -- placeholder is a literal directory name
-          .setPlaceholder('.claude')
+          .setPlaceholder(DEFAULT_CLAUDE_DIR_NAME)
           .setValue(claudeSettings.claudeVaultDirName)
           .onChange(async (value) => {
             const trimmed = value.trim();
@@ -205,7 +203,7 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
             }
 
             claudeVaultDirValidationEl.toggleClass('claudian-hidden', true);
-            const dirName = trimmed || '.claude';
+            const dirName = trimmed || DEFAULT_CLAUDE_DIR_NAME;
 
             // Persist only — path resolution is fixed at load time; a restart is
             // required to apply.
