@@ -1,8 +1,11 @@
 import * as os from 'os';
 import * as path from 'path';
 
-let _globalDirName = '.claude';
-let _vaultDirName = '.claude';
+/** Conventional default Claude directory name used for global home and vault config. */
+export const DEFAULT_CLAUDE_DIR_NAME = '.claude';
+
+let _globalDirName = DEFAULT_CLAUDE_DIR_NAME;
+let _vaultDirName = DEFAULT_CLAUDE_DIR_NAME;
 
 /**
  * Validates a Claude home directory name. Rejects empty, '.', '..',
