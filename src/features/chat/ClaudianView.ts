@@ -325,7 +325,11 @@ export class ClaudianView extends ItemView {
     }
 
     try {
-      await this.initializeView();
+      await this.initializeView(
+        previousLifecycleWasClosing,
+        shutdownSnapshotPromise,
+        lifecycleRevision,
+      );
     } catch {
       // Ensure the user sees a recoverable message rather than a broken panel.
       const container = this.contentEl ?? this.containerEl;
@@ -337,7 +341,11 @@ export class ClaudianView extends ItemView {
     }
   }
 
-  private async initializeView(): Promise<void> {
+  private async initializeView(
+    previousLifecycleWasClosing: boolean,
+    shutdownSnapshotPromise: Promise<void> | null,
+    lifecycleRevision: number,
+  ): Promise<void> {
     if (!this.containerEl) {
       return;
     }
