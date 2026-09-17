@@ -257,10 +257,12 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
             claudeHomeDirValidationEl.toggleClass('claudian-hidden', true);
             const dirName = trimmed || DEFAULT_CLAUDE_DIR_NAME;
 
-            // Persist only — do NOT call setClaudeHomeDirName() here. Path
-            // resolution is fixed at load time; a restart is required to apply.
-            updateClaudeProviderSettings(settingsBag, { claudeHomeDirName: dirName });
-            await context.plugin.saveSettings();
+            // Persist through the settings coordinator — do NOT call
+            // setClaudeHomeDirName() here. Path resolution is fixed at load time;
+            // a restart is required to apply.
+            await context.plugin.mutateSettings((settings) => {
+              updateClaudeProviderSettings(settings, { claudeHomeDirName: dirName });
+            });
 
             new Notice(t('settings.claudeHomeDirName.restartNotice'));
           });
@@ -293,10 +295,11 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
             claudeVaultDirValidationEl.toggleClass('claudian-hidden', true);
             const dirName = trimmed || DEFAULT_CLAUDE_DIR_NAME;
 
-            // Persist only — path resolution is fixed at load time; a restart is
-            // required to apply.
-            updateClaudeProviderSettings(settingsBag, { claudeVaultDirName: dirName });
-            await context.plugin.saveSettings();
+            // Persist through the settings coordinator — path resolution is fixed
+            // at load time; a restart is required to apply.
+            await context.plugin.mutateSettings((settings) => {
+              updateClaudeProviderSettings(settings, { claudeVaultDirName: dirName });
+            });
 
             new Notice(t('settings.claudeHomeDirName.restartNotice'));
           });
