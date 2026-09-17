@@ -6,11 +6,11 @@ import {
   readStoredString,
 } from '../../core/providers/settings/storedSettings';
 import type { HostnameCliPaths } from '../../core/types/settings';
+import { isValidClaudeHomeDirName } from './claudePaths';
 import {
   type ClaudeModelEnvironmentType,
   isClaudeModelEnvironmentType,
 } from './modelTiers';
-import { isValidClaudeHomeDirName } from './claudePaths';
 
 export const CLAUDE_SAFE_MODES = ['acceptEdits', 'auto', 'default'] as const;
 export type ClaudeSafeMode = typeof CLAUDE_SAFE_MODES[number];
