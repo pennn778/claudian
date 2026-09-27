@@ -5,6 +5,7 @@ import * as path from 'path';
 import { findBinaryInDirectories, isExistingFile } from '@/utils/cliBinaryLocator';
 import { getEnhancedPath } from '@/utils/env';
 import { parsePathEntries } from '@/utils/path';
+
 import { getGlobalClaudePath } from '../claudePaths';
 
 const CLAUDE_CODE_PACKAGE_SEGMENTS = ['node_modules', '@anthropic-ai', 'claude-code'];
