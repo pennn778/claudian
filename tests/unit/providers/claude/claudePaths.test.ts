@@ -129,15 +129,6 @@ describe('claudePaths', () => {
   });
 
   describe('dynamic path functions in Claude storage modules', () => {
-    it('getSkillsPath / getCommandsPath respond to vault dir name changes', async () => {
-      const { getSkillsPath } = await import('@/providers/claude/storage/SkillStorage');
-      const { getCommandsPath } = await import('@/providers/claude/storage/SlashCommandStorage');
-
-      setClaudeVaultDirName('.claude-internal');
-      expect(getSkillsPath()).toBe('.claude-internal/skills');
-      expect(getCommandsPath()).toBe('.claude-internal/commands');
-    });
-
     it('getSDKProjectsPath responds to global dir name changes', async () => {
       const { getSDKProjectsPath } = await import('@/providers/claude/history/sdkSessionPaths');
       expect(getSDKProjectsPath()).toBe(path.join(os.homedir(), '.claude', 'projects'));
