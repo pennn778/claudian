@@ -9,7 +9,7 @@ import type { ChatFeatureHost } from '@/features/chat/ChatFeatureHost';
 import { SessionManagerSurface, setControlAvailability } from '@/features/chat/session-manager/SessionManagerSurface';
 import { SessionNavigation } from '@/features/chat/session-manager/SessionNavigation';
 import type { ChatTab, TabId } from '@/features/chat/tabs/ChatTab';
-import { TabWorkspaceLifecycle } from '@/features/chat/tabs/persistence/TabWorkspaceLifecycle';
+import { TabWorkspaceLifecycle, type TabWorkspaceOpening } from '@/features/chat/tabs/persistence/TabWorkspaceLifecycle';
 import { getTabProviderId } from '@/features/chat/tabs/providerResolution';
 import { TabBar } from '@/features/chat/tabs/TabBar';
 import {
@@ -202,7 +202,6 @@ export class ClaudianView extends ItemView implements ZenModeSource {
 
   private async onOpenImpl() {
     const opening = this.tabWorkspace.beginOpen();
-    const lifecycleRevision = opening.revision;
 
     // Guard: Hover Editor and similar plugins may call onOpen before DOM is ready.
     // containerEl must exist before we can access contentEl or create elements.
@@ -211,11 +210,7 @@ export class ClaudianView extends ItemView implements ZenModeSource {
     }
 
     try {
-      await this.initializeView(
-        lifecycleRevision,
-        previousLifecycleWasClosing,
-        shutdownSnapshotPromise,
-      );
+      await this.initializeView(opening);
     } catch {
       // Ensure the user sees a recoverable message rather than a broken panel.
       const container = this.contentEl ?? this.containerEl;
@@ -227,11 +222,8 @@ export class ClaudianView extends ItemView implements ZenModeSource {
     }
   }
 
-  private async initializeView(
-    lifecycleRevision: number,
-    previousLifecycleWasClosing: boolean,
-    shutdownSnapshotPromise: Promise<void> | null,
-  ): Promise<void> {
+  private async initializeView(opening: TabWorkspaceOpening): Promise<void> {
+    const lifecycleRevision = opening.revision;
     if (!this.containerEl) {
       return;
     }
