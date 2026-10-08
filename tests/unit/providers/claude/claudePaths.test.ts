@@ -130,7 +130,7 @@ describe('claudePaths', () => {
 
   describe('dynamic path functions in Claude storage modules', () => {
     it('getSDKProjectsPath responds to global dir name changes', async () => {
-      const { getSDKProjectsPath } = await import('@/providers/claude/history/sdkSessionPaths');
+      const { getSDKProjectsPath } = await import('@/providers/claude/history/ClaudeHistoryPathResolver');
       expect(getSDKProjectsPath()).toBe(path.join(os.homedir(), '.claude', 'projects'));
 
       setClaudeHomeDirName('.claude-internal');
